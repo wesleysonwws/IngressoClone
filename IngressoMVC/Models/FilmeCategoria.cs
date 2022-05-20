@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace IngressoMVC.Models
 {
@@ -13,9 +10,11 @@ namespace IngressoMVC.Models
             CategoriaId = categoriaId;
         }
 
+        [Key]
         public int FilmeId { get; set; }
         public Filme Filme { get; set; }
 
+        [Key]
         public int CategoriaId { get; set; }
         public Categoria Categoria { get; set; }
     }
