@@ -14,6 +14,14 @@ namespace IngressoMVC.Models
             ImageURL = imageURL;
         }
 
+        public Filme(string titulo, string descricao, decimal preco, string imageURL, int produtorId, int cinemaId)
+        {
+            Titulo = titulo;
+            Descricao = descricao;
+            Preco = preco;
+            ImageURL = imageURL;
+        }
+
         public int Id { get; set; }
         public DateTime DataCadastro { get; set; }
         public DateTime DataAlteracao { get; set; }
