@@ -1,9 +1,7 @@
 ﻿using IngressoMVC.Data;
+using IngressoMVC.Models;
+using IngressoMVC.Models.ViewModels.RequestDTO;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IngressoMVC.Controllers
 {
@@ -20,7 +18,7 @@ namespace IngressoMVC.Controllers
         {
             return View(_context.Atores);
         }
-
+                
         public IActionResult Detalhes(int id)
         {
             return View(_context.Atores.Find(id));
@@ -29,6 +27,22 @@ namespace IngressoMVC.Controllers
         public IActionResult Criar()
         {
             return View();
+        }
+                
+
+        [HttpPost]
+        public IActionResult Criar(PostAtorDTO atorDto)
+        {
+            //validar os dados
+            //instanciar novo ator
+            Ator ator = new Ator(atorDto.Nome, atorDto.Bio, atorDto.FotoPerfilURL);
+
+            //gravar esse ator no banco de dados
+            _context.Atores.Add(ator);
+
+            //salvar as mudanças
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Atualizar(int id)
