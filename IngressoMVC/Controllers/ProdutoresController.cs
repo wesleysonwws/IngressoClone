@@ -2,10 +2,6 @@
 using IngressoMVC.Models;
 using IngressoMVC.Models.ViewModels.RequestDTO;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IngressoMVC.Controllers
 {
@@ -36,6 +32,11 @@ namespace IngressoMVC.Controllers
         [HttpPost]
         public IActionResult Criar(PostProdutorDTO produtorDto)
         {
+            if(!ModelState.IsValid)
+            {
+                return View(produtorDto);
+            }
+
             Produtor produtor = new Produtor(
                 produtorDto.Nome, 
                 produtorDto.Bio, 

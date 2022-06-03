@@ -32,6 +32,8 @@ namespace IngressoMVC.Controllers
         [HttpPost]
         public IActionResult Criar(PostCinemaDTO cinemaDto)
         {
+            if (!ModelState.IsValid) return View(cinemaDto);
+            
             Cinema cinema = new Cinema(cinemaDto.Nome, cinemaDto.Descricao, cinemaDto.LogoURL);
             _context.Cinemas.Add(cinema);
             _context.SaveChanges();
