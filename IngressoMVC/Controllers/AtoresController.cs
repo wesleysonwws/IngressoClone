@@ -53,11 +53,39 @@ namespace IngressoMVC.Controllers
 
         public IActionResult Atualizar(int id)
         {
+            if (id == null)
+                return NotFound();
+
             //buscar o ator no banco
+            var result = _context.Atores.FirstOrDefault(a => a.Id == id);
+
+            if (result == null)
+                return View();
+            
             //passar o ator na view
-            return View();
+            return View(result);
         }
-         
+
+        [HttpPost]
+        public IActionResult Atualizar(int id, PostAtorDTO atorDto)
+        {
+            var ator = _context.Atores.FirstOrDefault(a => a.Id == id);
+
+            #region Sem Encapsulamento - Modelo Anemico
+            //ator.Nome = atorDto.Nome;
+            //ator.Bio = atorDto.Bio;
+            //ator.FotoPerfilURL = atorDto.FotoPerfilURL;
+            //ator.DataAlteracao = DateTime.Now;
+            #endregion
+                        
+            ator.AtualizarDados(atorDto.Nome, atorDto.Bio, atorDto.FotoPerfilURL);
+
+            _context.Update(ator);
+            _context.SaveChanges();
+               
+            return RedirectToAction(nameof(Index));
+        }
+
         public IActionResult Deletar(int id)
         {
             var result = _context.Atores.FirstOrDefault(a => a.Id == id);
