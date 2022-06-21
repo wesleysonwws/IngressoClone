@@ -19,7 +19,7 @@ namespace IngressoMVC.Controllers
         {
             return View(_context.Atores);
         }
-                
+
         public IActionResult Detalhes(int id)
         {
             return View(_context.Atores.Find(id));
@@ -29,16 +29,14 @@ namespace IngressoMVC.Controllers
         {
             return View();
         }
-                
+
 
         [HttpPost]
         public IActionResult Criar(PostAtorDTO atorDto)
         {
             //validar os dados
-            if(!ModelState.IsValid || !atorDto.FotoPerfilURL.EndsWith(".jpg"))
-            {
+            if (!ModelState.IsValid)
                 return View(atorDto);
-            }
 
             //instanciar novo ator
             Ator ator = new Ator(atorDto.Nome, atorDto.Bio, atorDto.FotoPerfilURL);
@@ -51,7 +49,7 @@ namespace IngressoMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Atualizar(int id)
+        public IActionResult Atualizar(int? id)
         {
             if (id == null)
                 return NotFound();
@@ -61,7 +59,7 @@ namespace IngressoMVC.Controllers
 
             if (result == null)
                 return View();
-            
+
             //passar o ator na view
             return View(result);
         }
@@ -71,18 +69,14 @@ namespace IngressoMVC.Controllers
         {
             var ator = _context.Atores.FirstOrDefault(a => a.Id == id);
 
-            #region Sem Encapsulamento - Modelo Anemico
-            //ator.Nome = atorDto.Nome;
-            //ator.Bio = atorDto.Bio;
-            //ator.FotoPerfilURL = atorDto.FotoPerfilURL;
-            //ator.DataAlteracao = DateTime.Now;
-            #endregion
-                        
+            if (!ModelState.IsValid)
+                return View(ator);
+
             ator.AtualizarDados(atorDto.Nome, atorDto.Bio, atorDto.FotoPerfilURL);
 
             _context.Update(ator);
             _context.SaveChanges();
-               
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -90,7 +84,7 @@ namespace IngressoMVC.Controllers
         {
             var result = _context.Atores.FirstOrDefault(a => a.Id == id);
 
-            if(result == null) return View();
+            if (result == null) return View();
 
             return View(result);
         }
