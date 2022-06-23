@@ -2,6 +2,7 @@
 using IngressoMVC.Models;
 using IngressoMVC.Models.ViewModels.RequestDTO;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace IngressoMVC.Controllers
 {
@@ -33,9 +34,7 @@ namespace IngressoMVC.Controllers
         public IActionResult Criar(PostProdutorDTO produtorDto)
         {
             if(!ModelState.IsValid)
-            {
                 return View(produtorDto);
-            }
 
             Produtor produtor = new Produtor(
                 produtorDto.Nome, 
@@ -48,18 +47,54 @@ namespace IngressoMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Atualizar(int id)
+        public IActionResult Atualizar(int? id)
         {
-            //buscar o ator no banco
-            //passar o ator na view
-            return View();
+            if(id == null)
+                return NotFound();
+
+            var result = _context.Produtores.FirstOrDefault(p => p.Id == id);
+            
+            if(result == null)
+                return View();
+
+            return View(result);
+        }
+
+        [HttpPost]
+        public IActionResult Atualizar(int id, PostProdutorDTO produtorDTO)
+        {
+            var produtor = _context.Produtores.FirstOrDefault(p => p.Id == id);
+
+            if(!ModelState.IsValid)
+                return View();
+
+            produtor.AtualizarDados(produtorDTO.Nome, produtorDTO.Bio, produtorDTO.FotoPerfilURL);
+
+            _context.Update(produtor);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Deletar(int id)
         {
-            //buscar o ator no banco
-            //passar o ator na view
-            return View();
+            var result = _context.Produtores.FirstOrDefault(p => p.Id == id);
+
+            if(result == null)
+                return View();
+
+            return View(result);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmarDeletar(int id)
+        {
+            var result = _context.Produtores.FirstOrDefault(p => p.Id == id);
+            
+            _context.Produtores.Remove(result);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
