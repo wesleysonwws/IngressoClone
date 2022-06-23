@@ -20,7 +20,7 @@ namespace IngressoMVC
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<IngressoDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("PersonalDb")));
+                options.UseSqlServer(Configuration.GetConnectionString("SqlServer")));
 
             services.AddControllersWithViews();
         }

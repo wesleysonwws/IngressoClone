@@ -2,6 +2,7 @@
 using IngressoMVC.Models;
 using IngressoMVC.Models.ViewModels.RequestDTO;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace IngressoMVC.Controllers
 {
@@ -14,45 +15,62 @@ namespace IngressoMVC.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
-        {
-            return View(_context.Categorias);
-        }
+        public IActionResult Index() => View(_context.Categorias);
 
-        public IActionResult Detalhes(int id)
-        {
-            return View(_context.Categorias.Find(id));
-        }
+        public IActionResult Detalhes(int id) => View(_context.Categorias.Find(id));
 
-        public IActionResult Criar()
-        {
-            return View();
-        }
+        public IActionResult Criar() => View();
 
         [HttpPost]
         public IActionResult Criar(PostCategoriaDTO categoriaDto)
         {
-            if(!ModelState.IsValid)
-                return View(categoriaDto);
-
+            if(!ModelState.IsValid) return View(categoriaDto);
             Categoria categoria = new Categoria(categoriaDto.Nome);
             _context.Add(categoria);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Atualizar(int id)
+        public IActionResult Atualizar(int? id)
         {
-            //buscar o ator no banco
-            //passar o ator na view
-            return View();
+            if (id == null) return NotFound();
+
+            var result = _context.Categorias.FirstOrDefault(a => a.Id == id);
+
+            if (result == null) return View();          
+            
+            return View(result);
+        }
+
+        [HttpPost]
+        public IActionResult Atualizar(int id, PostCategoriaDTO categoriaDto)
+        {
+            var result = _context.Categorias.FirstOrDefault(a => a.Id == id);
+
+            if (!ModelState.IsValid) return View(result);
+
+            result.AtualizarDados(categoriaDto.Nome);
+            _context.Categorias.Update(result);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Deletar(int id)
         {
-            //buscar o ator no banco
-            //passar o ator na view
-            return View();
+            var result = _context.Categorias.FirstOrDefault(a => a.Id == id);
+            if (result == null) return View();
+            return View(result);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmarDeletar(int id)
+        {
+            var result = _context.Categorias.FirstOrDefault(a => a.Id == id);
+            _context.Categorias.Remove(result);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

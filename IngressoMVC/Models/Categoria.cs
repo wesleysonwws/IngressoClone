@@ -16,5 +16,11 @@ namespace IngressoMVC.Models
         public DateTime DataAlteracao { get; set; }
         public string Nome { get; private set; }
         public List<FilmeCategoria> FilmesCategorias { get; set; }
+
+        public void AtualizarDados(string nome)
+        {
+            Nome = nome;
+            DataAlteracao = DateTime.Now;
+        }
     }
 }
