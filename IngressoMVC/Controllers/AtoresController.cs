@@ -1,6 +1,7 @@
 ﻿using IngressoMVC.Data;
 using IngressoMVC.Models;
 using IngressoMVC.Models.ViewModels.RequestDTO;
+using IngressoMVC.Models.ViewModels.ResponseDTO;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -15,21 +16,26 @@ namespace IngressoMVC.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index() => View(_context.Atores);
+
+        public IActionResult Detalhes(int id) => View(AtorFilmes(id));
+
+        public GetAtorDto AtorFilmes(int id)
         {
-            return View(_context.Atores);
+            var result = _context.Atores.Where(at => at.Id == id)
+                .Select(at => new GetAtorDto()
+                {
+                    Bio = at.Bio,
+                    FotoPerfilURL = at.FotoPerfilURL,
+                    Nome = at.Nome,
+                    TituloFilmes = at.AtoresFilmes.Select(fm => fm.Filme.Titulo).ToList(),
+                    FilmeFotoURL = at.AtoresFilmes.Select(fm => fm.Filme.ImageURL).ToList()
+                }).FirstOrDefault();
+
+            return result;
         }
 
-        public IActionResult Detalhes(int id)
-        {
-            return View(_context.Atores.Find(id));
-        }
-
-        public IActionResult Criar()
-        {
-            return View();
-        }
-
+        public IActionResult Criar() => View();
 
         [HttpPost]
         public IActionResult Criar(PostAtorDTO atorDto)
