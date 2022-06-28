@@ -41,7 +41,7 @@ namespace IngressoMVC.Controllers
                 );
 
             _context.Add(filme);
-            _context.SaveChanges();            
+            _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
         }
@@ -69,28 +69,18 @@ namespace IngressoMVC.Controllers
             _context.SaveChanges();
 
             //Incluir Relacionamentos
-            foreach(var categoria in filmeDto.Categorias)
+            foreach (var categoriaId in filmeDto.CategoriasId)
             {
-                int? categoriaId = _context.Categorias.Where(c => c.Nome == categoria).FirstOrDefault().Id;
-
-                if (categoriaId != null)
-                {
-                    var novaCategoria = new FilmeCategoria(filme.Id, categoriaId.Value);
-                    _context.FilmesCategorias.Add(novaCategoria);
-                    _context.SaveChanges();
-                }
+                var novaCategoria = new FilmeCategoria(filme.Id, categoriaId);
+                _context.FilmesCategorias.Add(novaCategoria);
+                _context.SaveChanges();
             }
 
-            foreach(var ator in filmeDto.NomeAtores)
+            foreach (var atorId in filmeDto.AtoresId)
             {
-                int? atorId = _context.Atores.Where(a => a.Nome == ator).FirstOrDefault().Id;
-
-                if(atorId != null)
-                {
-                    var novoAtor = new AtorFilme(atorId.Value, filme.Id);
-                    _context.AtoresFilmes.Add(novoAtor);
-                    _context.SaveChanges();
-                }
+                var novoAtor = new AtorFilme(atorId, filme.Id);
+                _context.AtoresFilmes.Add(novoAtor);
+                _context.SaveChanges();
             }
 
             return RedirectToAction(nameof(Index));

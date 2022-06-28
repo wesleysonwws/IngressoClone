@@ -17,8 +17,8 @@ namespace IngressoMVC.Models.ViewModels.RequestDTO
 
         public string NomePodutor { get; set; }
 
-        public List<string> NomeAtores { get; set; }
-        public List<string> Categorias { get; set; }
+        public List<int> AtoresId { get; set; }
+        public List<int> CategoriasId { get; set; }
         #endregion
     }
 }
