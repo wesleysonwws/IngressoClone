@@ -15,11 +15,20 @@
 <div class="row">
     <div id="carouselExampleControls" class="carousel slide col-md-4 offset-md-4" data-ride="carousel">
         <div class="carousel-inner">
-            @foreach (var filme in @Model.FilmeFotoURL)
+            @foreach(var filme in @Model.FilmeFotoURL)
             {
-                <div class="carousel-item active">
-                    <img src="@filme" class="d-block w-100">
-                </div>
+                if(filme == @Model.FilmeFotoURL.First())
+                {
+                    <div class="carousel-item active">
+                        <img src="@filme" class="d-block w-100">
+                    </div>
+                }
+                else
+                {
+                    <div class="carousel-item">
+                        <img src="@filme" class="d-block w-100">
+                    </div>
+                }
             }
         </div>
         <button class="carousel-control-prev" type="button" data-target="#carouselExampleControls" data-slide="prev">
