@@ -3,6 +3,7 @@ using IngressoMVC.Models;
 using IngressoMVC.Models.ViewModels.RequestDTO;
 using IngressoMVC.Models.ViewModels.ResponseDTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace IngressoMVC.Controllers
@@ -22,7 +23,21 @@ namespace IngressoMVC.Controllers
 
         public GetAtorDto AtorFilmes(int id)
         {
-            var result = _context.Atores.Where(at => at.Id == id)
+            #region Método 1 - Recupera a entidade, Instancia o objeto passando os dados 
+            //var ator = _context.Atores.Include(b => b.AtoresFilmes).ThenInclude(f => f.Filme).FirstOrDefault(at => at.Id == id);                       
+
+            //GetAtorDto result = new GetAtorDto()
+            //{
+            //    Nome = ator.Nome,
+            //    Bio = ator.Bio,
+            //    FotoPerfilURL = ator.FotoPerfilURL,
+            //    FilmeFotoURL = ator.AtoresFilmes.Select(af => af.Filme.ImageURL).ToList(),
+            //    TituloFilmes = ator.AtoresFilmes.Select(af => af.Filme.Titulo).ToList()
+            //};
+            #endregion
+
+            #region Método 2 - Recupera o objeto passando os dados para o objeto instanciado
+            var result = _context.Atores.Where(ator => ator.Id == id)
                 .Select(at => new GetAtorDto()
                 {
                     Bio = at.Bio,
@@ -31,7 +46,11 @@ namespace IngressoMVC.Controllers
                     TituloFilmes = at.AtoresFilmes.Select(fm => fm.Filme.Titulo).ToList(),
                     FilmeFotoURL = at.AtoresFilmes.Select(fm => fm.Filme.ImageURL).ToList()
                 }).FirstOrDefault();
+            #endregion
 
+            #region Método 3 - Sql Pura            
+            // _context.Atores.FromSqlRaw("select * from Atores inner join AtoresFilmes on Atores.id = AtoresFilmes.AtorId inner join Filmes on Filmes.Id = AtoresFilmes.FilmeId where Atores.Id = @id ");
+            #endregion
             return result;
         }
 
