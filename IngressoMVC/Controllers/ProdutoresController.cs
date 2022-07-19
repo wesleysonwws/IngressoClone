@@ -3,6 +3,7 @@ using IngressoMVC.Models;
 using IngressoMVC.Models.ViewModels.RequestDTO;
 using IngressoMVC.Models.ViewModels.ResponseDTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace IngressoMVC.Controllers
@@ -22,15 +23,16 @@ namespace IngressoMVC.Controllers
 
         public GetProdutorDto ProdutorFilmes(int id)
         {
-            var result = _context.Produtores.Where(at => at.Id == id)
-                .Select(at => new GetProdutorDto()
-                {
-                    Bio = at.Bio,
-                    FotoPerfilURL = at.FotoPerfilURL,
-                    Nome = at.Nome,
-                    TituloFilmes = at.Filmes.Select(fm => fm.Titulo).ToList(),
-                    FilmeFotoURL = at.Filmes.Select(fm => fm.ImageURL).ToList()
-                }).FirstOrDefault();
+            var produtor = _context.Produtores.Include(p => p.Filmes).FirstOrDefault(p => p.Id == id);
+
+            GetProdutorDto result = new GetProdutorDto()
+            {
+                Nome = produtor.Nome,
+                Bio = produtor.Bio,
+                FotoPerfilURL = produtor.FotoPerfilURL,
+                FilmeFotoURL = produtor.Filmes.Select(fm => fm.ImageURL).ToList(),
+                TituloFilmes = produtor.Filmes.Select(fm => fm.Titulo).ToList()
+            };            
 
             return result;
         }
