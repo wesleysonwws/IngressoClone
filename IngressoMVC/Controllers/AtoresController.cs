@@ -23,35 +23,19 @@ namespace IngressoMVC.Controllers
 
         public GetAtorDto AtorFilmes(int id)
         {
-            #region Método 1 - Recupera a entidade, Instancia o objeto passando os dados 
-            var ator = _context.Atores.Include(b => b.AtoresFilmes).ThenInclude(f => f.Filme).FirstOrDefault(at => at.Id == id);
+            var result = _context.Atores
+                .FirstOrDefault(at => at.Id == id);
 
-            GetAtorDto result = new GetAtorDto()
+            GetAtorDto ator = new GetAtorDto()
             {
-                Nome = ator.Nome,
-                Bio = ator.Bio,
-                FotoPerfilURL = ator.FotoPerfilURL,
-                FilmeFotoURL = ator.AtoresFilmes.Select(af => af.Filme.ImageURL).ToList(),
-                TituloFilmes = ator.AtoresFilmes.Select(af => af.Filme.Titulo).ToList()
+                Nome = result.Nome,
+                Bio = result.Bio,
+                FotoPerfilURL = result.FotoPerfilURL,
+                FilmeFotoURL = result.AtoresFilmes.Select(af => af.Filme.ImageURL).ToList(),
+                TituloFilmes = result.AtoresFilmes.Select(af => af.Filme.Titulo).ToList()
             };
-            #endregion
 
-            #region Método 2 - Recupera o objeto passando os dados para o objeto instanciado
-            //var result = _context.Atores.Where(ator => ator.Id == id)
-            //    .Select(at => new GetAtorDto()
-            //    {
-            //        Bio = at.Bio,
-            //        FotoPerfilURL = at.FotoPerfilURL,
-            //        Nome = at.Nome,
-            //        TituloFilmes = at.AtoresFilmes.Select(fm => fm.Filme.Titulo).ToList(),
-            //        FilmeFotoURL = at.AtoresFilmes.Select(fm => fm.Filme.ImageURL).ToList()
-            //    }).FirstOrDefault();
-            #endregion
-
-            #region Método 3 - Sql Pura            
-            // _context.Atores.FromSqlRaw("select * from Atores inner join AtoresFilmes on Atores.id = AtoresFilmes.AtorId inner join Filmes on Filmes.Id = AtoresFilmes.FilmeId where Atores.Id = @id ");
-            #endregion
-            return result;
+            return ator;
         }
 
         public IActionResult Criar() => View();
@@ -59,18 +43,13 @@ namespace IngressoMVC.Controllers
         [HttpPost]
         public IActionResult Criar(PostAtorDTO atorDto)
         {
-            //validar os dados
             if (!ModelState.IsValid)
                 return View(atorDto);
 
-            //instanciar novo ator
             Ator ator = new Ator(atorDto.Nome, atorDto.Bio, atorDto.FotoPerfilURL);
-
-            //gravar esse ator no banco de dados
             _context.Atores.Add(ator);
-
-            //salvar as mudanças
             _context.SaveChanges();
+            
             return RedirectToAction(nameof(Index));
         }
 
@@ -79,13 +58,11 @@ namespace IngressoMVC.Controllers
             if (id == null)
                 return NotFound();
 
-            //buscar o ator no banco
             var result = _context.Atores.FirstOrDefault(a => a.Id == id);
 
             if (result == null)
                 return View();
 
-            //passar o ator na view
             return View(result);
         }
 
@@ -114,14 +91,13 @@ namespace IngressoMVC.Controllers
             return View(result);
         }
 
-        [HttpPost, ActionName("Deletar")]
-        public IActionResult ConfirmarDeletar(int id)
-        {
-            var result = _context.Atores.FirstOrDefault(a => a.Id == id);
-            _context.Atores.Remove(result);
-            _context.SaveChanges();
+[HttpPost, ActionName("Deletar")]
+public IActionResult ConfirmarDeletar(int id)
+{
+    var result = _context.Atores.FirstOrDefault(a => a.Id == id);
+    _context.Atores.Remove(result);
 
-            return RedirectToAction(nameof(Index));
-        }
+    return RedirectToAction(nameof(Index));
+}
     }
 }
