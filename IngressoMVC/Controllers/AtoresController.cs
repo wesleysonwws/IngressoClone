@@ -17,25 +17,33 @@ namespace IngressoMVC.Controllers
             _context = context;
         }
 
-        public IActionResult Index() => View(_context.Atores);
-
-        public IActionResult Detalhes(int id) => View(AtorFilmes(id));
-
-        public GetAtorDto AtorFilmes(int id)
+        public IActionResult Index()
         {
-            var result = _context.Atores
-                .FirstOrDefault(at => at.Id == id);
+            return View(_context.Atores);
+        }
 
-            GetAtorDto ator = new GetAtorDto()
+        public IActionResult Detalhes(int id)
+        {
+            var resultado = _context.Atores
+                .Include(af => af.AtoresFilmes)
+                .ThenInclude(f => f.Filme)
+                .FirstOrDefault(ator => ator.Id == id);
+
+            if (resultado == null)
+                return View();
+
+            GetAtorDto atorDTO = new GetAtorDto()
             {
-                Nome = result.Nome,
-                Bio = result.Bio,
-                FotoPerfilURL = result.FotoPerfilURL,
-                FilmeFotoURL = result.AtoresFilmes.Select(af => af.Filme.ImageURL).ToList(),
-                TituloFilmes = result.AtoresFilmes.Select(af => af.Filme.Titulo).ToList()
+                Nome = resultado.Nome,
+                Bio = resultado.Bio,
+                FotoPerfilURL = resultado.FotoPerfilURL,
+                FotoURLFilmes = resultado.AtoresFilmes
+                    .Select(af => af.Filme.ImageURL).ToList(),
+                NomeFilmes = resultado.AtoresFilmes
+                    .Select(af => af.Filme.Titulo).ToList()
             };
 
-            return ator;
+            return View(atorDTO);
         }
 
         public IActionResult Criar() => View();
@@ -91,13 +99,13 @@ namespace IngressoMVC.Controllers
             return View(result);
         }
 
-[HttpPost, ActionName("Deletar")]
-public IActionResult ConfirmarDeletar(int id)
-{
-    var result = _context.Atores.FirstOrDefault(a => a.Id == id);
-    _context.Atores.Remove(result);
+        [HttpPost, ActionName("Deletar")]
+        public IActionResult ConfirmarDeletar(int id)
+        {
+            var result = _context.Atores.FirstOrDefault(a => a.Id == id);
+            _context.Atores.Remove(result);
 
-    return RedirectToAction(nameof(Index));
-}
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

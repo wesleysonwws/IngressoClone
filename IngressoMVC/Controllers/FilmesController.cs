@@ -22,58 +22,31 @@ namespace IngressoMVC.Controllers
         public IActionResult Criar() => View();
 
         [HttpPost]
-        public IActionResult Criar(PostFilmeDTO filmeDto)
+        IActionResult Criar(PostFilmeDTO filmeDto)
         {
-            var cinema = _context.Cinemas.FirstOrDefault(c => c.Nome == filmeDto.NomeCinema);
-            if (cinema == null) return View();
-
-            var produtor = _context.Produtores.FirstOrDefault(p => p.Nome == filmeDto.NomePodutor);
-            if (produtor == null) return View();
-
             Filme filme = new Filme
                 (
                     filmeDto.Titulo,
                     filmeDto.Descricao,
                     filmeDto.Preco,
                     filmeDto.ImageURL,
-                    cinema.Id,
-                    produtor.Id
+                    _context.Produtores
+                        .FirstOrDefault(x => x.Id == filmeDto.ProdutorId).Id
                 );
 
             _context.Add(filme);
             _context.SaveChanges();
 
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost]
-        public IActionResult CriarFilmeComCategoriasAtores(PostFilmeDTO filmeDto)
-        {
-            var cinema = _context.Cinemas.FirstOrDefault(c => c.Nome == filmeDto.NomeCinema);
-            if (cinema == null) return View();
-
-            var produtor = _context.Produtores.FirstOrDefault(p => p.Nome == filmeDto.NomePodutor);
-            if (produtor == null) return View();
-
-            Filme filme = new Filme
-                (
-                    filmeDto.Titulo,
-                    filmeDto.Descricao,
-                    filmeDto.Preco,
-                    filmeDto.ImageURL,
-                    cinema.Id,
-                    produtor.Id
-                );
-
-            _context.Add(filme);
-            _context.SaveChanges();
-
-            //Incluir Relacionamentos
-            foreach (var categoriaId in filmeDto.CategoriasId)
+            foreach (var categoria in filmeDto.Categorias)
             {
-                var novaCategoria = new FilmeCategoria(filme.Id, categoriaId);
-                _context.FilmesCategorias.Add(novaCategoria);
-                _context.SaveChanges();
+                int? categoriaId = _context.Categorias.Where(c => c.Nome == categoria).FirstOrDefault().Id;
+
+                if (categoriaId != null)
+                {
+                    var novaCategoria = new FilmeCategoria(filme.Id, categoriaId.Value);
+                    _context.FilmesCategorias.Add(novaCategoria);
+                    _context.SaveChanges();
+                }
             }
 
             foreach (var atorId in filmeDto.AtoresId)
@@ -88,16 +61,54 @@ namespace IngressoMVC.Controllers
 
         public IActionResult Atualizar(int id)
         {
-            //buscar o ator no banco
-            //passar o ator na view
-            return View();
+            var result = _context.Filmes.FirstOrDefault(x => x.Id == id);
+
+            if (result == null)
+                return View("NotFound");
+
+            return View(result);
+        }
+
+        [HttpPost]
+        public IActionResult Atualizar(int id, PostFilmeDTO filmeDto)
+        {
+            var result = _context.Filmes.FirstOrDefault(x => x.Id == id);
+
+            if (!ModelState.IsValid)
+                return View(result);
+
+            result.AlterarDados(
+                filmeDto.Titulo,
+                filmeDto.Descricao,
+                filmeDto.Preco,
+                filmeDto.ImageURL);
+
+            _context.Update(result);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Deletar(int id)
         {
-            //buscar o ator no banco
-            //passar o ator na view
-            return View();
+            //buscar o filme no banco
+            var result = _context.Filmes.FirstOrDefault(x => x.Id == id);
+
+            if (result == null)
+                return View("NotFound");
+            //passar o filme na view
+            return View(result);
+        }
+
+        [HttpPost, ActionName("Deletar")]
+        public IActionResult ConfirmarDeletar(int id)
+        {
+            var result = _context.Filmes.FirstOrDefault(x => x.Id == id);
+
+            _context.Remove(result);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

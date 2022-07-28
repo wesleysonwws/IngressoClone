@@ -19,22 +19,23 @@ namespace IngressoMVC.Controllers
 
         public IActionResult Index() => View(_context.Produtores);
 
-        public IActionResult Detalhes(int id) => View(ProdutorFilmes(id));
-
-        public GetProdutorDto ProdutorFilmes(int id)
+        public IActionResult Detalhes(int id)
         {
-            var produtor = _context.Produtores.Include(p => p.Filmes).FirstOrDefault(p => p.Id == id);
+            var resultado = _context.Produtores.Include(p => p.Filmes).FirstOrDefault(p => p.Id == id);
 
-            GetProdutorDto result = new GetProdutorDto()
+            if (resultado == null)
+                return View();
+
+            GetAtorDto atorDTO = new GetAtorDto()
             {
-                Nome = produtor.Nome,
-                Bio = produtor.Bio,
-                FotoPerfilURL = produtor.FotoPerfilURL,
-                FilmeFotoURL = produtor.Filmes.Select(fm => fm.ImageURL).ToList(),
-                TituloFilmes = produtor.Filmes.Select(fm => fm.Titulo).ToList()
-            };            
+                Nome = resultado.Nome,
+                Bio = resultado.Bio,
+                FotoPerfilURL = resultado.FotoPerfilURL,
+                FotoURLFilmes = resultado.Filmes.Select(fm => fm.ImageURL).ToList(),
+                NomeFilmes = resultado.Filmes.Select(fm => fm.Titulo).ToList()
+            };
 
-            return result;
+            return View(atorDTO);
         }
 
         public IActionResult Criar()

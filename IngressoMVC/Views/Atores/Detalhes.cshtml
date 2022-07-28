@@ -11,14 +11,14 @@
 
 </div>
 
-@if(@Model.FilmeFotoURL.Count > 0)
+@if(@Model.FotoURLFilmes.Count > 0)
 {
     <div class="row">
         <div id="carouselExampleControls" class="carousel slide col-md-4 offset-md-4" data-ride="carousel">
             <div class="carousel-inner">
-                @foreach(var filme in @Model.FilmeFotoURL)
+                @foreach(var filme in @Model.FotoURLFilmes)
                 {
-                    if(filme == @Model.FilmeFotoURL.First())
+                    if(filme == @Model.FotoURLFilmes.First())
                     {
                         <div class="carousel-item active">
                             <img src="@filme" class="d-block w-100">

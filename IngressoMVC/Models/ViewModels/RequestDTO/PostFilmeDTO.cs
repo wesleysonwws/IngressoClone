@@ -15,10 +15,10 @@ namespace IngressoMVC.Models.ViewModels.RequestDTO
         #region relacionamentos
         public string NomeCinema { get; set; }
 
-        public string NomePodutor { get; set; }
+        public int ProdutorId { get; set; }
 
         public List<int> AtoresId { get; set; }
-        public List<int> CategoriasId { get; set; }
+        public List<string> Categorias { get; set; } //Por Id
         #endregion
     }
 }

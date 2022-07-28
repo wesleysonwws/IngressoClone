@@ -9,6 +9,8 @@ namespace IngressoMVC.Models
         public Categoria(string nome)
         {
             Nome = nome;
+            DataCadastro = DateTime.Now;
+            DataAlteracao = DataCadastro;
         }
 
         public int Id { get; private set; }
